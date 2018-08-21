@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package>
-  <name>cv_camera</name>
+  <name>elp_camera</name>
   <version>0.3.0</version>
   <description>cv_camera uses OpenCV capture object to capture camera image.
   This supports camera_image and nodelet.
