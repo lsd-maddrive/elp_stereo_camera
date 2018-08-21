@@ -12,8 +12,8 @@ namespace enc = sensor_msgs::image_encodings;
 Capture::Capture(ros::NodeHandle &node, const std::string &topic_name,
                  int32_t buffer_size, const std::string &frame_id)
     : node_(node),
-      left_it_(ros::NodeHandle(node, "left_it")),
-      right_it_(ros::NodeHandle(node, "right_it")),
+      left_it_(ros::NodeHandle(node, "left")),
+      right_it_(ros::NodeHandle(node, "right")),
       topic_name_(topic_name),
       buffer_size_(buffer_size),
       frame_id_(frame_id),
@@ -48,13 +48,14 @@ void Capture::parseCustomSettings()
 
 void Capture::advertise()
 {
-  left_pub_ = left_it_.advertiseCamera("left/" + topic_name_, buffer_size_);
-  right_pub_ = right_it_.advertiseCamera("right/" + topic_name_, buffer_size_);
+  left_pub_ = left_it_.advertiseCamera(topic_name_, buffer_size_);
+  right_pub_ = right_it_.advertiseCamera(topic_name_, buffer_size_);
 }
 
 void Capture::loadCameraInfo()
 {
   std::string url;
+
   if (node_.getParam("left/camera_info_url", url))
   {
     if (left_info_manager_.validateURL(url))
@@ -147,7 +148,7 @@ bool Capture::capture()
     left_bridge_.header.stamp     = now;
     left_bridge_.header.frame_id  = frame_id_;
     left_bridge_.image            = base_frame_( cv::Rect(0, 
-                                                          base_frame_.rows, 
+                                                          0, 
                                                           base_frame_.cols/2, 
                                                           base_frame_.rows) );
 
@@ -155,7 +156,7 @@ bool Capture::capture()
     right_bridge_.header.stamp    = now;
     right_bridge_.header.frame_id = frame_id_;
     right_bridge_.image           = base_frame_( cv::Rect(base_frame_.cols/2, 
-                                                          base_frame_.rows, 
+                                                          0, 
                                                           base_frame_.cols/2, 
                                                           base_frame_.rows) );
 
