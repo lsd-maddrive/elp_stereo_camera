@@ -50,6 +50,12 @@ public:
   void open(int32_t device_id);
 
   /**
+   * @brief TODO <<<
+   */
+  void parseCustomSettings();
+  void advertise();
+
+  /**
    * @brief Open capture device with device name.
    *
    * @param device_path path of the camera device
@@ -111,9 +117,9 @@ public:
    *
    * @return captured cv::Mat
    */
-  inline const cv::Mat &getCvImage() const
+  inline const cv::Mat &getCvImage(cv_bridge::CvImage &bridge) const
   {
-    return bridge_.image;
+    return bridge.image;
   }
 
   /**
@@ -123,9 +129,9 @@ public:
    *
    * @return message pointer.
    */
-  inline const sensor_msgs::ImagePtr getImageMsgPtr() const
+  inline const sensor_msgs::ImagePtr getImageMsgPtr(cv_bridge::CvImage &bridge) const
   {
-    return bridge_.toImageMsg();
+    return bridge.toImageMsg();
   }
 
   /**
@@ -134,7 +140,7 @@ public:
    */
   inline bool setWidth(int32_t width)
   {
-    return cap_.set(CV_CAP_PROP_FRAME_WIDTH, width);
+    return cap_.set(CV_CAP_PROP_FRAME_WIDTH, width*2 /* As it gives double frame */);
   }
 
   /**
@@ -166,7 +172,8 @@ private:
   /**
    * @brief ROS image transport utility.
    */
-  image_transport::ImageTransport it_;
+  image_transport::ImageTransport left_it_;
+  image_transport::ImageTransport right_it_;
 
   /**
    * @brief name of topic without namespace (usually "image_raw").
@@ -185,7 +192,8 @@ private:
   /**
    * @brief image publisher created by image_transport::ImageTransport.
    */
-  image_transport::CameraPublisher pub_;
+  image_transport::CameraPublisher left_pub_;
+  image_transport::CameraPublisher right_pub_;
 
   /**
    * @brief capture device.
@@ -193,21 +201,29 @@ private:
   cv::VideoCapture cap_;
 
   /**
+   * @brief full frame from camera
+   */
+  cv::Mat base_frame_;
+
+  /**
    * @brief this stores last captured image.
    */
-  cv_bridge::CvImage bridge_;
+  cv_bridge::CvImage left_bridge_;
+  cv_bridge::CvImage right_bridge_;
 
   /**
    * @brief this stores last captured image info.
    *
    * currently this has image size (width/height) only.
    */
-  sensor_msgs::CameraInfo info_;
+  sensor_msgs::CameraInfo left_info_;
+  sensor_msgs::CameraInfo right_info_;
 
   /**
    * @brief camera info manager
    */
-  camera_info_manager::CameraInfoManager info_manager_;
+  camera_info_manager::CameraInfoManager left_info_manager_;
+  camera_info_manager::CameraInfoManager right_info_manager_;
 
   /**
    * @brief rescale_camera_info param value

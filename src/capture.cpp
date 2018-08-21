@@ -16,23 +16,13 @@ Capture::Capture(ros::NodeHandle &node, const std::string &topic_name,
       topic_name_(topic_name),
       buffer_size_(buffer_size),
       frame_id_(frame_id),
-      info_manager_(node_, frame_id)
+      left_info_manager_(ros::NodeHandle(node, "left"), "left_camera"),
+      right_info_manager_(ros::NodeHandle(node, "right"), "right_camera")
 {
 }
 
-void Capture::loadCameraInfo()
+void Capture::parseCustomSettings()
 {
-  std::string url;
-  if (node_.getParam("camera_info_url", url))
-  {
-    if (info_manager_.validateURL(url))
-    {
-      info_manager_.loadCameraInfo(url);
-    }
-  }
-
-  rescale_camera_info_ = node_.param<bool>("rescale_camera_info", false);
-
   for (int i = 0;; ++i)
   {
     int code = 0;
@@ -55,23 +45,51 @@ void Capture::loadCameraInfo()
   }
 }
 
-void Capture::rescaleCameraInfo(int width, int height)
+void Capture::advertise()
 {
-  double width_coeff = static_cast<double>(width) / info_.width;
-  double height_coeff = static_cast<double>(height) / info_.height;
-  info_.width = width;
-  info_.height = height;
+  left_pub_ = left_it_.advertiseCamera("left/" + topic_name_, buffer_size_);
+  right_pub_ = right_it_.advertiseCamera("right/" + topic_name_, buffer_size_);
+}
+
+void Capture::loadCameraInfo()
+{
+  std::string url;
+  if (node_.getParam("left/camera_info_url", url))
+  {
+    if (left_info_manager_.validateURL(url))
+    {
+      left_info_manager_.loadCameraInfo(url);
+    }
+  }
+
+  if (node_.getParam("right/camera_info_url", url))
+  {
+    if (right_info_manager_.validateURL(url))
+    {
+      right_info_manager_.loadCameraInfo(url);
+    }
+  }
+
+  rescale_camera_info_ = node_.param<bool>("rescale_camera_info", false);
+}
+
+void Capture::rescaleCameraInfo(int width, int height, sensor_msgs::CameraInfo info)
+{
+  double width_coeff = static_cast<double>(width) / info.width;
+  double height_coeff = static_cast<double>(height) / info.height;
+  info.width = width;
+  info.height = height;
 
   // See http://docs.ros.org/api/sensor_msgs/html/msg/CameraInfo.html for clarification
-  info_.K[0] *= width_coeff;
-  info_.K[2] *= width_coeff;
-  info_.K[4] *= height_coeff;
-  info_.K[5] *= height_coeff;
+  info.K[0] *= width_coeff;
+  info.K[2] *= width_coeff;
+  info.K[4] *= height_coeff;
+  info.K[5] *= height_coeff;
 
-  info_.P[0] *= width_coeff;
-  info_.P[2] *= width_coeff;
-  info_.P[5] *= height_coeff;
-  info_.P[6] *= height_coeff;
+  info.P[0] *= width_coeff;
+  info.P[2] *= width_coeff;
+  info.P[5] *= height_coeff;
+  info.P[6] *= height_coeff;
 }
 
 void Capture::open(int32_t device_id)
@@ -83,8 +101,8 @@ void Capture::open(int32_t device_id)
     stream << "device_id" << device_id << " cannot be opened";
     throw DeviceError(stream.str());
   }
-  pub_ = it_.advertiseCamera(topic_name_, buffer_size_);
 
+  advertise();
   loadCameraInfo();
 }
 
@@ -95,8 +113,8 @@ void Capture::open(const std::string &device_path)
   {
     throw DeviceError("device_path " + device_path + " cannot be opened");
   }
-  pub_ = it_.advertiseCamera(topic_name_, buffer_size_);
 
+  advertise();
   loadCameraInfo();
 }
 
@@ -114,52 +132,86 @@ void Capture::openFile(const std::string &file_path)
     stream << "file " << file_path << " cannot be opened";
     throw DeviceError(stream.str());
   }
-  pub_ = it_.advertiseCamera(topic_name_, buffer_size_);
 
-  std::string url;
-  if (node_.getParam("camera_info_url", url))
-  {
-    if (info_manager_.validateURL(url))
-    {
-      info_manager_.loadCameraInfo(url);
-    }
-  }
+  advertise();
+  loadCameraInfo();
 }
 
 bool Capture::capture()
 {
-  if (cap_.read(bridge_.image))
+  if (cap_.read(base_frame_))
   {
     ros::Time now = ros::Time::now();
-    bridge_.encoding = enc::BGR8;
-    bridge_.header.stamp = now;
-    bridge_.header.frame_id = frame_id_;
+    left_bridge_.encoding         = enc::BGR8;
+    left_bridge_.header.stamp     = now;
+    left_bridge_.header.frame_id  = frame_id_;
+    left_bridge_.image            = base_frame_( Rect(0, frame.rows, frame.cols/2, frame.rows) );
 
-    info_ = info_manager_.getCameraInfo();
-    if (info_.height == 0 && info_.width == 0)
+    right_bridge_.encoding        = enc::BGR8;
+    right_bridge_.header.stamp    = now;
+    right_bridge_.header.frame_id = frame_id_;
+    right_bridge_.image           = base_frame_( Rect(frame.cols/2, frame.rows, frame.cols/2, frame.rows) );
+
+    /* Left resize */
+    left_info_ = left_info_manager_.getCameraInfo();
+    if (left_info_.height == 0 && left_info_.width == 0)
     {
-      info_.height = bridge_.image.rows;
-      info_.width = bridge_.image.cols;
+      left_info_.height = left_bridge_.image.rows;
+      left_info_.width = left_bridge_.image.cols;
     }
-    else if (info_.height != bridge_.image.rows || info_.width != bridge_.image.cols)
+    else if (left_info_.height != left_bridge_.image.rows || left_info_.width != left_bridge_.image.cols)
     {
       if (rescale_camera_info_)
       {
-        int old_width = info_.width;
-        int old_height = info_.height;
-        rescaleCameraInfo(bridge_.image.cols, bridge_.image.rows);
+        int old_width = left_info_.width;
+        int old_height = left_info_.height;
+
+        rescaleCameraInfo(left_bridge_.image.cols, left_bridge_.image.rows, );
+
         ROS_INFO_ONCE("Camera calibration automatically rescaled from %dx%d to %dx%d",
-                      old_width, old_height, bridge_.image.cols, bridge_.image.rows);
+                      old_width, old_height, left_bridge_.image.cols, left_bridge_.image.rows);
       }
       else
       {
         ROS_WARN_ONCE("Calibration resolution %dx%d does not match camera resolution %dx%d. "
                       "Use rescale_camera_info param for rescaling",
-                      info_.width, info_.height, bridge_.image.cols, bridge_.image.rows);
+                      left_info_.width, left_info_.height, left_bridge_.image.cols, left_bridge_.image.rows);
       }
     }
-    info_.header.stamp = now;
-    info_.header.frame_id = frame_id_;
+
+    /* Right resize */
+    right_info_ = right_info_manager_.getCameraInfo();
+    if (right_info_.height == 0 && right_info_.width == 0)
+    {
+      right_info_.height = right_bridge_.image.rows;
+      right_info_.width = right_bridge_.image.cols;
+    }
+    else if (right_info_.height != right_bridge_.image.rows || right_info_.width != right_bridge_.image.cols)
+    {
+      if (rescale_camera_info_)
+      {
+        int old_width = right_info_.width;
+        int old_height = right_info_.height;
+
+        rescaleCameraInfo(right_bridge_.image.cols, right_bridge_.image.rows, );
+
+        ROS_INFO_ONCE("Camera calibration automatically rescaled from %dx%d to %dx%d",
+                      old_width, old_height, right_bridge_.image.cols, right_bridge_.image.rows);
+      }
+      else
+      {
+        ROS_WARN_ONCE("Calibration resolution %dx%d does not match camera resolution %dx%d. "
+                      "Use rescale_camera_info param for rescaling",
+                      right_info_.width, right_info_.height, right_bridge_.image.cols, right_bridge_.image.rows);
+      }
+    }
+
+    /* Info fill */
+    left_info_.header.stamp = now;
+    left_info_.header.frame_id = frame_id_;
+    
+    right_info_.header.stamp = now;
+    right_info_.header.frame_id = frame_id_;
 
     return true;
   }
@@ -168,7 +220,8 @@ bool Capture::capture()
 
 void Capture::publish()
 {
-  pub_.publish(*getImageMsgPtr(), info_);
+  left_pub_.publish(*getImageMsgPtr(left_bridge_), left_info_);
+  right_pub_.publish(*getImageMsgPtr(right_bridge_), right_info_);
 }
 
 bool Capture::setPropertyFromParam(int property_id, const std::string &param_name)
