@@ -12,7 +12,8 @@ namespace enc = sensor_msgs::image_encodings;
 Capture::Capture(ros::NodeHandle &node, const std::string &topic_name,
                  int32_t buffer_size, const std::string &frame_id)
     : node_(node),
-      it_(node_),
+      left_it_(ros::NodeHandle(node, "left_it")),
+      right_it_(ros::NodeHandle(node, "right_it")),
       topic_name_(topic_name),
       buffer_size_(buffer_size),
       frame_id_(frame_id),
@@ -145,12 +146,18 @@ bool Capture::capture()
     left_bridge_.encoding         = enc::BGR8;
     left_bridge_.header.stamp     = now;
     left_bridge_.header.frame_id  = frame_id_;
-    left_bridge_.image            = base_frame_( Rect(0, frame.rows, frame.cols/2, frame.rows) );
+    left_bridge_.image            = base_frame_( cv::Rect(0, 
+                                                          base_frame_.rows, 
+                                                          base_frame_.cols/2, 
+                                                          base_frame_.rows) );
 
     right_bridge_.encoding        = enc::BGR8;
     right_bridge_.header.stamp    = now;
     right_bridge_.header.frame_id = frame_id_;
-    right_bridge_.image           = base_frame_( Rect(frame.cols/2, frame.rows, frame.cols/2, frame.rows) );
+    right_bridge_.image           = base_frame_( cv::Rect(base_frame_.cols/2, 
+                                                          base_frame_.rows, 
+                                                          base_frame_.cols/2, 
+                                                          base_frame_.rows) );
 
     /* Left resize */
     left_info_ = left_info_manager_.getCameraInfo();
@@ -166,7 +173,7 @@ bool Capture::capture()
         int old_width = left_info_.width;
         int old_height = left_info_.height;
 
-        rescaleCameraInfo(left_bridge_.image.cols, left_bridge_.image.rows, );
+        rescaleCameraInfo(left_bridge_.image.cols, left_bridge_.image.rows, left_info_);
 
         ROS_INFO_ONCE("Camera calibration automatically rescaled from %dx%d to %dx%d",
                       old_width, old_height, left_bridge_.image.cols, left_bridge_.image.rows);
@@ -193,7 +200,7 @@ bool Capture::capture()
         int old_width = right_info_.width;
         int old_height = right_info_.height;
 
-        rescaleCameraInfo(right_bridge_.image.cols, right_bridge_.image.rows, );
+        rescaleCameraInfo(right_bridge_.image.cols, right_bridge_.image.rows, right_info_);
 
         ROS_INFO_ONCE("Camera calibration automatically rescaled from %dx%d to %dx%d",
                       old_width, old_height, right_bridge_.image.cols, right_bridge_.image.rows);

@@ -105,10 +105,10 @@ public:
    *
    * @return CameraInfo
    */
-  inline const sensor_msgs::CameraInfo &getInfo() const
-  {
-    return info_;
-  }
+  // inline const sensor_msgs::CameraInfo &getInfo() const
+  // {
+  //   return info_;
+  // }
 
   /**
    * @brief accessor of cv::Mat
