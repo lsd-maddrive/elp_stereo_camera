@@ -162,7 +162,7 @@ private:
   /**
    * @brief rescale camera calibration to another resolution
    */
-  void rescaleCameraInfo(int width, int height);
+  void rescaleCameraInfo(int width, int height, sensor_msgs::CameraInfo &info);
 
   /**
    * @brief node handle for advertise.

@@ -74,7 +74,7 @@ void Capture::loadCameraInfo()
   rescale_camera_info_ = node_.param<bool>("rescale_camera_info", false);
 }
 
-void Capture::rescaleCameraInfo(int width, int height, sensor_msgs::CameraInfo info)
+void Capture::rescaleCameraInfo(int width, int height, sensor_msgs::CameraInfo &info)
 {
   double width_coeff = static_cast<double>(width) / info.width;
   double height_coeff = static_cast<double>(height) / info.height;
