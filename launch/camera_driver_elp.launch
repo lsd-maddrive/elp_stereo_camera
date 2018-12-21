@@ -12,7 +12,7 @@
 
 	<!-- <node pkg="nodelet" type="nodelet" name="standalone_nodelet"  args="manager"/> -->
 
-	<node ns="stereo" name="cameras" pkg="elp_camera" type="cv_camera_node" output="screen">
+	<node ns="stereo" name="cameras" pkg="elp_stereo_camera" type="cv_camera_node" output="screen">
 		<param name="device_path" value="$(arg video_device)" />
 
 		<param name="left/camera_info_url" value="file://$(find elp_stereo_camera)/calib_data/left.yaml" if="$(arg camera_info)"/> 
