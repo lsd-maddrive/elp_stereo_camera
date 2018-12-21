@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<launch>
+
+	<arg name="video_device" default="/dev/video0" />
+
+	<arg name="image_width" default="640" />
+	<arg name="image_height" default="480" />
+
+	<arg name="framerate" default="30" />
+
+	<arg name="camera_info" default="false" />
+
+	<!-- <node pkg="nodelet" type="nodelet" name="standalone_nodelet"  args="manager"/> -->
+
+	<node ns="stereo" name="cameras" pkg="elp_camera" type="cv_camera_node" output="screen">
+		<param name="device_path" value="$(arg video_device)" />
+
+		<param name="left/camera_info_url" value="file://$(find elp_stereo_camera)/calib_data/left.yaml" if="$(arg camera_info)"/> 
+		<param name="right/camera_info_url" value="file://$(find elp_stereo_camera)/calib_data/right.yaml" if="$(arg camera_info)"/> 
+
+		<param name="image_width" value="$(arg image_width)" />
+		<param name="image_height" value="$(arg image_height)" />
+		<param name="rate" value="$(arg framerate)" /> 
+		<param name="frame_id" value="cameras" />
+
+	</node>
+
+</launch>

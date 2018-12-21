@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<launch>
+	<include file="$(find elp_stereo_camera)/launch/camera_driver_elp.launch">
+		<arg name="camera_info" value="false" />
+	</include>
+
+	<node ns="stereo/cameras" pkg="camera_calibration" type="cameracalibrator.py" name="cameracalibrator" 
+		args="--size 7x5 --square 0.03  
+		right:=right/image_raw left:=left/image_raw 
+		right_camera:=right left_camera:=left" 
+		output="screen">
+	</node>
+
+</launch>
