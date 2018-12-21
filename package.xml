@@ -1,15 +1,15 @@
 <?xml version="1.0"?>
 <package>
-  <name>elp_camera</name>
+  <name>elp_stereo_camera</name>
   <version>0.3.0</version>
-  <description>cv_camera uses OpenCV capture object to capture camera image.
+  <description>elp_stereo_camera uses OpenCV capture object to capture camera image.
   This supports camera_image and nodelet.
   </description>
-  <maintainer email="t.ogura@gmail.com">Takashi Ogura</maintainer>
+  <maintainer email=""></maintainer>
   <license>BSD</license>
 
-  <url type="website">http://wiki.ros.org/cv_camera</url>
-  <author email="t.ogura@gmail.com">Takashi Ogura</author>
+  <url type="website">http://wiki.ros.org</url>
+  <author email=""></author>
 
   <buildtool_depend>catkin</buildtool_depend>
   <build_depend>opencv3</build_depend>

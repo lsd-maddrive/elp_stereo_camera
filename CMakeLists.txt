@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(elp_camera)
+project(elp_stereo_camera)
 
 find_package(catkin REQUIRED COMPONENTS
   image_transport roscpp cv_bridge sensor_msgs nodelet camera_info_manager roslint)
