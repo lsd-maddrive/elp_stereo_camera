@@ -1,6 +1,12 @@
 <?xml version="1.0"?>
 <launch>
 
+    <arg name="pi/2" value="1.5707963267948966" />
+
+    <node pkg="tf" type="static_transform_publisher" name="camera_base_link"
+        args="0 0 0 -$(arg pi/2) 0 -$(arg pi/2) base_link cameras 100" /> 
+
+
 	<arg name="video_device" default="/dev/video0" />
 
 	<arg name="image_width" default="640" />

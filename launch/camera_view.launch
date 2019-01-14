@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <launch>
 	<include file="$(find elp_stereo_camera)/launch/camera_driver_elp.launch">
+		<arg name="video_device" value="/dev/video1" />
 		<arg name="camera_info" value="true" />
 	</include>
 
