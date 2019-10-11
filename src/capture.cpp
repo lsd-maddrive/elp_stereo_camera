@@ -143,6 +143,8 @@ bool Capture::capture()
 {
   if (cap_.read(base_frame_))
   {
+    cv::GaussianBlur(base_frame_, base_frame_, cv::Size(7, 7), 0);
+
     ros::Time now = ros::Time::now();
     left_bridge_.encoding         = enc::BGR8;
     left_bridge_.header.stamp     = now;
