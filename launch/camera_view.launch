@@ -7,13 +7,13 @@
 		<arg name="camera_info" value="true" />
 	</include>
 
-	<node ns="stereo/cameras" name="right_view" pkg="image_view" type="image_view" output="screen">
+	<!-- <node ns="stereo/cameras" name="right_view" pkg="image_view" type="image_view" output="screen">
 		<remap from="image" to="right/image_raw" />
 	</node>
 
 	<node ns="stereo/cameras" name="left_view" pkg="image_view" type="image_view" output="screen">
 		<remap from="image" to="left/image_raw" />
-	</node>
+	</node> -->
 
 	<node ns="stereo/cameras" pkg="stereo_image_proc" type="stereo_image_proc" name="stereo_image_proc" output="screen">
         <!-- <param name="speckle_range" value="4" />

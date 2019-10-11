@@ -6,7 +6,6 @@
     <node pkg="tf" type="static_transform_publisher" name="camera_base_link"
         args="0 0 0 -$(arg pi/2) 0 -$(arg pi/2) base_link cameras 100" /> 
 
-
 	<arg name="video_device" default="/dev/video0" />
 
 	<arg name="image_width" default="640" />
@@ -15,14 +14,15 @@
 	<arg name="framerate" default="30" />
 
 	<arg name="camera_info" default="false" />
+	<arg name="calib_data_path" default="$(find elp_stereo_camera)/calib_data" />
 
 	<!-- <node pkg="nodelet" type="nodelet" name="standalone_nodelet"  args="manager"/> -->
 
 	<node ns="stereo" name="cameras" pkg="elp_stereo_camera" type="cv_camera_node" output="screen">
 		<param name="device_path" value="$(arg video_device)" />
 
-		<param name="left/camera_info_url" value="file://$(find elp_stereo_camera)/calib_data/left.yaml" if="$(arg camera_info)"/> 
-		<param name="right/camera_info_url" value="file://$(find elp_stereo_camera)/calib_data/right.yaml" if="$(arg camera_info)"/> 
+		<param if="$(arg camera_info)" name="left/camera_info_url" value="file://$(arg calib_data_path)/left.yaml" /> 
+		<param if="$(arg camera_info)" name="right/camera_info_url" value="file://$(arg calib_data_path)/right.yaml" /> 
 
 		<param name="image_width" value="$(arg image_width)" />
 		<param name="image_height" value="$(arg image_height)" />

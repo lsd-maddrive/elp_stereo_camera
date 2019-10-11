@@ -8,9 +8,11 @@
 	</include>
 
 	<node ns="stereo/cameras" pkg="camera_calibration" type="cameracalibrator.py" name="cameracalibrator" 
-		args="--size 7x5 --square 0.03  
-		right:=right/image_raw left:=left/image_raw 
-		right_camera:=right left_camera:=left" 
+		args="--size 6x4 --square 0.038
+			right:=right/image_raw
+			left:=left/image_raw 
+			right_camera:=right 
+			left_camera:=left" 
 		output="screen">
 	</node>
 

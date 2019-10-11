@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<launch>
+	<arg name="video_device" default="/dev/video0" />
+
+	<include file="$(find elp_stereo_camera)/launch/camera_driver_elp.launch">
+		<arg name="video_device" value="$(arg video_device)" />
+		<arg name="camera_info" value="true" />
+	</include>
+
+	<node ns="stereo/cameras" pkg="stereo_image_proc" type="stereo_image_proc" name="stereo_image_proc" output="screen">
+	</node>
+
+	<node pkg="camera_calibration" type="cameracheck.py" name="cameracheck" 
+		args="--size 6x4 --square 0.038
+			image:=image_rect 
+			stereo:=stereo/cameras" 
+		output="screen">
+	</node>
+
+</launch>
