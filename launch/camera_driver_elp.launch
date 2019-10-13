@@ -6,7 +6,7 @@
     <node pkg="tf" type="static_transform_publisher" name="camera_base_link"
         args="0 0 0 -$(arg pi/2) 0 -$(arg pi/2) base_link stereo_camera_link 100" /> 
 
-	<arg name="video_device" default="/dev/video0" />
+	<arg name="video_device" default="/dev/elp_stereo" />
 
 	<arg name="image_width" default="640" />
 	<arg name="image_height" default="480" />

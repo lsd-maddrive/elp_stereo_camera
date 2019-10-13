@@ -7,6 +7,10 @@ cv_camera_node
 This node uses [camera_info_manager](http://wiki.ros.org/camera_info_manager) for dealing with camera_info.
 If no calibration data is set, it has dummy values except for width and height.
 
+### On start ###
+
+**Dont forget to install udev rules with `install_udev.sh`!**
+
 ### Publish ###
 
 * ~image_raw (sensor_msgs/Image)

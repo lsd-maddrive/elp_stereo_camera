@@ -1,0 +1,2 @@
+# ELP Dual Lens Sync Camera
+SUBSYSTEMS=="usb", KERNEL=="video*", ATTRS{idVendor}=="05a3", ATTRS{idProduct}=="9750", SYMLINK+="elp_stereo", MODE="0776"
