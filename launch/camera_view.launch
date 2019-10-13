@@ -5,26 +5,14 @@
 	<include file="$(find elp_stereo_camera)/launch/camera_driver_elp.launch">
 		<arg name="video_device" value="$(arg video_device)" />
 		<arg name="camera_info" value="true" />
+
+		<arg name="filter_type" value="gauss" />
+		<arg name="filter_kernel" value="7" />
 	</include>
 
-	<!-- <node ns="stereo/cameras" name="right_view" pkg="image_view" type="image_view" output="screen">
-		<remap from="image" to="right/image_raw" />
-	</node>
-
-	<node ns="stereo/cameras" name="left_view" pkg="image_view" type="image_view" output="screen">
-		<remap from="image" to="left/image_raw" />
-	</node> -->
-
-	<node ns="stereo/cameras" pkg="stereo_image_proc" type="stereo_image_proc" name="stereo_image_proc" output="screen">
-        <!-- <param name="speckle_range" value="4" />
-        <param name="min_disparity" value="-24" />
-        <param name="disparity_range" value="96" />
-        <param name="stereo_algorithm" value="0" /> -->
-	</node>
-
 	<node name="disparity_view" pkg="image_view" type="stereo_view" output="screen">
-		<remap from="stereo" to="stereo/cameras" />
-		<remap from="image" to="image_rect" />
+		<remap from="stereo" to="stereo" />
+		<remap from="image" to="image_rect_color" />
 	</node>
 
 </launch>

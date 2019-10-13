@@ -20,6 +20,11 @@ Capture::Capture(ros::NodeHandle &node, const std::string &topic_name,
       left_info_manager_(ros::NodeHandle(node, "left"), "left_camera"),
       right_info_manager_(ros::NodeHandle(node, "right"), "right_camera")
 {
+  node_.param<std::string>("filter_type", filter_type_, "none");
+  if ( filter_type_ == "blur" || filter_type_ == "gauss" )
+    node_.param<int>("filter_kernel", filter_kernel_sz_, 0);
+  else
+    filter_kernel_sz_ = 0;
 }
 
 void Capture::parseCustomSettings()
@@ -143,7 +148,14 @@ bool Capture::capture()
 {
   if (cap_.read(base_frame_))
   {
-    cv::GaussianBlur(base_frame_, base_frame_, cv::Size(7, 7), 0);
+    if ( filter_kernel_sz_ > 0 )
+    {
+      if ( filter_type_ == "gauss" )
+        cv::GaussianBlur(base_frame_, base_frame_, cv::Size(filter_kernel_sz_, filter_kernel_sz_), 0);
+      else if ( filter_type_ == "blur" )
+        cv::blur(base_frame_, base_frame_, cv::Size(filter_kernel_sz_, filter_kernel_sz_));
+    } 
+
 
     ros::Time now = ros::Time::now();
     left_bridge_.encoding         = enc::BGR8;

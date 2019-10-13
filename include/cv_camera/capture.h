@@ -205,6 +205,9 @@ private:
    */
   cv::Mat base_frame_;
 
+  std::string filter_type_;
+  int         filter_kernel_sz_;
+
   /**
    * @brief this stores last captured image.
    */

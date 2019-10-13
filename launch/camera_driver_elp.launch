@@ -16,9 +16,12 @@
 	<arg name="camera_info" default="false" />
 	<arg name="calib_data_path" default="$(find elp_stereo_camera)/calib_data" />
 
+	<arg name="filter_type" default="none" doc="Type of image filter: [none, blur, gauss]" />
+	<arg name="filter_kernel" default="0" doc="Size of kernel [integer]: 3, 5, 7, ..." />
+
 	<!-- <node pkg="nodelet" type="nodelet" name="standalone_nodelet"  args="manager"/> -->
 
-	<node ns="stereo" name="cameras" pkg="elp_stereo_camera" type="cv_camera_node" output="screen">
+	<node name="stereo" pkg="elp_stereo_camera" type="cv_camera_node" output="screen">
 		<param name="device_path" value="$(arg video_device)" />
 
 		<param if="$(arg camera_info)" name="left/camera_info_url" value="file://$(arg calib_data_path)/left.yaml" /> 
@@ -27,8 +30,18 @@
 		<param name="image_width" value="$(arg image_width)" />
 		<param name="image_height" value="$(arg image_height)" />
 		<param name="rate" value="$(arg framerate)" /> 
-		<param name="frame_id" value="cameras" />
+		<param name="frame_id" value="stereo_camera_link" />
 
+		<param name="filter_type" value="$(arg filter_type)" />
+		<param name="filter_kernel" value="$(arg filter_kernel)" />
+	</node>
+
+	<node if="$(arg camera_info)" ns="stereo" pkg="stereo_image_proc" type="stereo_image_proc" name="stereo_image_proc" output="screen">
+        <!-- Modified defaults -->
+		<param name="speckle_range" value="4" />
+        <param name="min_disparity" value="-24" />
+        <param name="disparity_range" value="96" />
+        <param name="stereo_algorithm" value="0" />
 	</node>
 
 </launch>

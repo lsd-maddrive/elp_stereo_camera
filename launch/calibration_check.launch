@@ -7,13 +7,10 @@
 		<arg name="camera_info" value="true" />
 	</include>
 
-	<node ns="stereo/cameras" pkg="stereo_image_proc" type="stereo_image_proc" name="stereo_image_proc" output="screen">
-	</node>
-
 	<node pkg="camera_calibration" type="cameracheck.py" name="cameracheck" 
 		args="--size 6x4 --square 0.038
-			image:=image_rect 
-			stereo:=stereo/cameras" 
+			image:=image_rect_color 
+			stereo:=stereo" 
 		output="screen">
 	</node>
 
