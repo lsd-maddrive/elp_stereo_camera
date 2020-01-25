@@ -140,7 +140,7 @@ public:
    */
   inline bool setWidth(int32_t width)
   {
-    return cap_.set(CV_CAP_PROP_FRAME_WIDTH, width*2 /* As it gives double frame */);
+    return cap_.set(cv::CAP_PROP_FRAME_WIDTH, width*2 /* As it gives double frame */);
   }
 
   /**
@@ -149,7 +149,7 @@ public:
    */
   inline bool setHeight(int32_t height)
   {
-    return cap_.set(CV_CAP_PROP_FRAME_HEIGHT, height);
+    return cap_.set(cv::CAP_PROP_FRAME_HEIGHT, height);
   }
 
   /**
