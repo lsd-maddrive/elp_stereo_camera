@@ -1,13 +1,10 @@
 <?xml version="1.0"?>
 <launch>
-
-    <arg name="pi/2" value="1.5707963267948966" />
-
-    <node pkg="tf" type="static_transform_publisher" name="stereo_camera_base_link"
-        args="0 0 0 -$(arg pi/2) 0 -$(arg pi/2) base_link stereo_camera_link 100" /> 
+	<arg name="tf_frame_name" default="stereo_camera_link" />
 
 	<arg name="video_device" default="/dev/elp_stereo" />
-
+	<arg name="camera_name" default="stereo" />
+	
 	<arg name="image_width" default="640" />
 	<arg name="image_height" default="480" />
 
@@ -19,7 +16,7 @@
 	<arg name="filter_type" default="none" doc="Type of image filter: [none, blur, gauss]" />
 	<arg name="filter_kernel" default="0" doc="Size of kernel [integer]: 3, 5, 7, ..." />
 
-	<node name="stereo" pkg="elp_stereo_camera" type="cv_camera_node" output="screen">
+	<node name="$(arg camera_name)" pkg="elp_stereo_camera" type="cv_camera_node" output="screen">
 		<param name="device_path" value="$(arg video_device)" />
 
 		<param if="$(arg camera_info)" name="left/camera_info_url" value="file://$(arg calib_data_path)/left.yaml" /> 
@@ -28,7 +25,7 @@
 		<param name="image_width" value="$(arg image_width)" />
 		<param name="image_height" value="$(arg image_height)" />
 		<param name="rate" value="$(arg framerate)" /> 
-		<param name="frame_id" value="stereo_camera_link" />
+		<param name="frame_id" value="$(arg tf_frame_name)" />
 
 		<param name="filter_type" value="$(arg filter_type)" />
 		<param name="filter_kernel" value="$(arg filter_kernel)" />
