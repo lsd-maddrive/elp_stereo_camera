@@ -3,7 +3,7 @@
 
     <arg name="pi/2" value="1.5707963267948966" />
 
-    <node pkg="tf" type="static_transform_publisher" name="camera_base_link"
+    <node pkg="tf" type="static_transform_publisher" name="stereo_camera_base_link"
         args="0 0 0 -$(arg pi/2) 0 -$(arg pi/2) base_link stereo_camera_link 100" /> 
 
 	<arg name="video_device" default="/dev/elp_stereo" />
@@ -19,8 +19,6 @@
 	<arg name="filter_type" default="none" doc="Type of image filter: [none, blur, gauss]" />
 	<arg name="filter_kernel" default="0" doc="Size of kernel [integer]: 3, 5, 7, ..." />
 
-	<!-- <node pkg="nodelet" type="nodelet" name="standalone_nodelet"  args="manager"/> -->
-
 	<node name="stereo" pkg="elp_stereo_camera" type="cv_camera_node" output="screen">
 		<param name="device_path" value="$(arg video_device)" />
 
@@ -35,13 +33,4 @@
 		<param name="filter_type" value="$(arg filter_type)" />
 		<param name="filter_kernel" value="$(arg filter_kernel)" />
 	</node>
-
-	<node if="$(arg camera_info)" ns="stereo" pkg="stereo_image_proc" type="stereo_image_proc" name="stereo_image_proc" output="screen">
-        <!-- Modified defaults -->
-		<param name="speckle_range" value="4" />
-        <param name="min_disparity" value="-24" />
-        <param name="disparity_range" value="96" />
-        <param name="stereo_algorithm" value="0" />
-	</node>
-
 </launch>

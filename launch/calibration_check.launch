@@ -7,6 +7,9 @@
 		<arg name="camera_info" value="true" />
 	</include>
 
+	<include file="$(find elp_stereo_camera)/launch/stereo_proc.launch">
+	</include>
+
 	<node pkg="camera_calibration" type="cameracheck.py" name="cameracheck" 
 		args="--size 6x4 --square 0.038
 			image:=image_rect_color 
