@@ -10,16 +10,18 @@ namespace cv_camera
 namespace enc = sensor_msgs::image_encodings;
 
 Capture::Capture(ros::NodeHandle &node, const std::string &topic_name,
-                 int32_t buffer_size, const std::string &frame_id)
+                 int32_t buffer_size, const std::string &frame_id_prefix)
     : node_(node),
       left_it_(ros::NodeHandle(node, "left")),
       right_it_(ros::NodeHandle(node, "right")),
       topic_name_(topic_name),
       buffer_size_(buffer_size),
-      frame_id_(frame_id),
       left_info_manager_(ros::NodeHandle(node, "left"), "left_camera"),
       right_info_manager_(ros::NodeHandle(node, "right"), "right_camera")
 {
+  left_frame_id_ = frame_id_prefix + "_left_optical_frame";
+  right_frame_id_ = frame_id_prefix + "_right_optical_frame";
+
   node_.param<std::string>("filter_type", filter_type_, "none");
   if ( filter_type_ == "blur" || filter_type_ == "gauss" )
     node_.param<int>("filter_kernel", filter_kernel_sz_, 0);
@@ -57,27 +59,25 @@ void Capture::advertise()
   right_pub_ = right_it_.advertiseCamera(topic_name_, buffer_size_);
 }
 
-void Capture::loadCameraInfo()
+void Capture::setCameraInfoRescale(bool enabled)
 {
-  std::string url;
+  rescale_camera_info_ = enabled;
+}
 
-  if (node_.getParam("left/camera_info_url", url))
+void Capture::loadLeftCameraInfo(const std::string url)
+{
+  if (left_info_manager_.validateURL(url))
   {
-    if (left_info_manager_.validateURL(url))
-    {
-      left_info_manager_.loadCameraInfo(url);
-    }
+    left_info_manager_.loadCameraInfo(url);
   }
+}
 
-  if (node_.getParam("right/camera_info_url", url))
+void Capture::loadRightCameraInfo(const std::string url)
+{
+  if (right_info_manager_.validateURL(url))
   {
-    if (right_info_manager_.validateURL(url))
-    {
-      right_info_manager_.loadCameraInfo(url);
-    }
+    right_info_manager_.loadCameraInfo(url);
   }
-
-  rescale_camera_info_ = node_.param<bool>("rescale_camera_info", false);
 }
 
 void Capture::rescaleCameraInfo(int width, int height, sensor_msgs::CameraInfo &info)
@@ -110,7 +110,6 @@ void Capture::open(int32_t device_id)
   }
 
   advertise();
-  loadCameraInfo();
 }
 
 void Capture::open(const std::string &device_path)
@@ -122,7 +121,6 @@ void Capture::open(const std::string &device_path)
   }
 
   advertise();
-  loadCameraInfo();
 }
 
 void Capture::open()
@@ -141,7 +139,6 @@ void Capture::openFile(const std::string &file_path)
   }
 
   advertise();
-  loadCameraInfo();
 }
 
 bool Capture::capture()
@@ -160,7 +157,7 @@ bool Capture::capture()
     ros::Time now = ros::Time::now();
     left_bridge_.encoding         = enc::BGR8;
     left_bridge_.header.stamp     = now;
-    left_bridge_.header.frame_id  = frame_id_;
+    left_bridge_.header.frame_id  = left_frame_id_;
     left_bridge_.image            = base_frame_( cv::Rect(0, 
                                                           0, 
                                                           base_frame_.cols/2, 
@@ -168,7 +165,7 @@ bool Capture::capture()
 
     right_bridge_.encoding        = enc::BGR8;
     right_bridge_.header.stamp    = now;
-    right_bridge_.header.frame_id = frame_id_;
+    right_bridge_.header.frame_id = right_frame_id_;
     right_bridge_.image           = base_frame_( cv::Rect(base_frame_.cols/2, 
                                                           0, 
                                                           base_frame_.cols/2, 
@@ -230,10 +227,10 @@ bool Capture::capture()
 
     /* Info fill */
     left_info_.header.stamp = now;
-    left_info_.header.frame_id = frame_id_;
+    left_info_.header.frame_id = left_frame_id_;
     
     right_info_.header.stamp = now;
-    right_info_.header.frame_id = frame_id_;
+    right_info_.header.frame_id = right_frame_id_;
 
     return true;
   }

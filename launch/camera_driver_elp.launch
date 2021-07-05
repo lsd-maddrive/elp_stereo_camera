@@ -1,9 +1,11 @@
 <?xml version="1.0"?>
 <launch>
-	<arg name="tf_frame_name" default="stereo_camera_link" />
+	<arg name="camera" default="elp_camera" />
+
+	<arg name="frame_id_prefix" default="$(arg camera)" />
+	<arg name="publish_tf_period" default="1000" />
 
 	<arg name="video_device" default="/dev/elp_stereo" />
-	<arg name="camera_name" default="stereo" />
 	
 	<arg name="image_width" default="640" />
 	<arg name="image_height" default="480" />
@@ -16,7 +18,7 @@
 	<arg name="filter_type" default="none" doc="Type of image filter: [none, blur, gauss]" />
 	<arg name="filter_kernel" default="0" doc="Size of kernel [integer]: 3, 5, 7, ..." />
 
-	<node name="$(arg camera_name)" pkg="elp_stereo_camera" type="cv_camera_node" output="screen">
+	<node ns="$(arg camera)" name="$(arg camera)_driver" pkg="elp_stereo_camera" type="cv_camera_node" output="screen">
 		<param name="device_path" value="$(arg video_device)" />
 
 		<param if="$(arg camera_info)" name="left/camera_info_url" value="file://$(arg calib_data_path)/left.yaml" /> 
@@ -25,9 +27,23 @@
 		<param name="image_width" value="$(arg image_width)" />
 		<param name="image_height" value="$(arg image_height)" />
 		<param name="rate" value="$(arg framerate)" /> 
-		<param name="frame_id" value="$(arg tf_frame_name)" />
+		<param name="frame_id_prefix" value="$(arg frame_id_prefix)" />
 
 		<param name="filter_type" value="$(arg filter_type)" />
 		<param name="filter_kernel" value="$(arg filter_kernel)" />
 	</node>
+
+	<node pkg="tf" type="static_transform_publisher" name="$(arg frame_id_prefix)_2_$(arg frame_id_prefix)_left" args="0 -0.3 0 0 0 0 $(arg frame_id_prefix)_link $(arg frame_id_prefix)_left $(arg publish_tf_period)" />
+	<node pkg="tf" type="static_transform_publisher" name="$(arg frame_id_prefix)_2_$(arg frame_id_prefix)_right" args="0 0.3 0 0 0 0 $(arg frame_id_prefix)_link $(arg frame_id_prefix)_right $(arg publish_tf_period)" />
+
+	<node pkg="tf" type="static_transform_publisher" name="$(arg frame_id_prefix)_2_$(arg frame_id_prefix)_left_optical" args="0 0 0 -1.57079632679 0 -1.570796 $(arg frame_id_prefix)_left $(arg frame_id_prefix)_left_optical_frame $(arg publish_tf_period)" />
+	<node pkg="tf" type="static_transform_publisher" name="$(arg frame_id_prefix)_2_$(arg frame_id_prefix)_right_optical" args="0 0 0 -1.57079632679 0 -1.570796 $(arg frame_id_prefix)_right $(arg frame_id_prefix)_right_optical_frame $(arg publish_tf_period)" />
+
+	<node if="$(arg camera_info)" ns="$(arg camera)" pkg="stereo_image_proc" type="stereo_image_proc" name="stereo_image_proc" output="screen">
+    <!-- Modified defaults -->
+    <param name="speckle_range" value="4" />
+    <param name="min_disparity" value="-24" />
+    <param name="disparity_range" value="96" />
+    <param name="stereo_algorithm" value="0" />
+  </node>
 </launch>
