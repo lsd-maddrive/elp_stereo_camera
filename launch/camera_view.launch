@@ -1,6 +1,8 @@
 <?xml version="1.0"?>
 <launch>
 	<arg name="video_device" default="/dev/elp_stereo" />
+	<arg name="configure" default="false" />
+	<arg name="rviz" default="false" />
 	
 	<include file="$(find elp_stereo_camera)/launch/camera_driver_elp.launch">
 		<arg name="video_device" value="$(arg video_device)" />
@@ -16,4 +18,8 @@
 		<remap from="image" to="image_rect_color" />
 	</node>
 
+	<node if="$(arg configure)" name="reconfigure" pkg="rqt_reconfigure" type="rqt_reconfigure" output="screen">
+	</node>
+	
+	<node if="$(arg rviz)" name="rviz" pkg="rviz" type="rviz" args="-d $(find elp_stereo_camera)/rviz/cameras_view.rviz" required="true" />
 </launch>
