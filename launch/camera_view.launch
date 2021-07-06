@@ -3,8 +3,9 @@
 	<arg name="video_device" default="/dev/elp_stereo" />
 	<arg name="configure" default="false" />
 	<arg name="rviz" default="false" />
+	<arg name="driver" default="false" />
 	
-	<include file="$(find elp_stereo_camera)/launch/camera_driver_elp.launch">
+	<include if="$(arg driver)" file="$(find elp_stereo_camera)/launch/camera_driver_elp.launch">
 		<arg name="video_device" value="$(arg video_device)" />
 		<arg name="camera_info" value="true" />
 		<arg name="camera" value="elp_camera" />
