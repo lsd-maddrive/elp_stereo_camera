@@ -7,8 +7,8 @@
 		<arg name="camera_info" value="false" />
 	</include>
 
-	<node ns="stereo" pkg="camera_calibration" type="cameracalibrator.py" name="cameracalibrator" 
-		args="--size 6x4 --square 0.038
+	<node ns="elp_camera" pkg="camera_calibration" type="cameracalibrator.py" name="cameracalibrator" 
+		args="--size 8x6 --square 0.101 --no-service-check
 			right:=right/image_raw
 			left:=left/image_raw 
 			right_camera:=right 
