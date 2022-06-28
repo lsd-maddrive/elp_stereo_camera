@@ -23,11 +23,11 @@ void Driver::setup()
   double hz(DEFAULT_RATE);
   int32_t device_id(0);
   std::string device_path("");
-  std::string frame_id_prefix("stereo_camera");
+  std::string frame_id("stereo_camera_left_optical");
   std::string file_path("");
 
   private_node_.getParam("device_id", device_id);
-  private_node_.getParam("frame_id_prefix", frame_id_prefix);
+  private_node_.getParam("frame_id", frame_id);
   private_node_.getParam("rate", hz);
 
   int32_t image_width(640);
@@ -36,7 +36,7 @@ void Driver::setup()
   camera_.reset(new Capture(camera_node_,
                             "image_raw",
                             PUBLISHER_BUFFER_SIZE,
-                            frame_id_prefix));
+                            frame_id));
 
   bool rescale_camera_info = private_node_.param<bool>("rescale_camera_info", false);
   camera_->setCameraInfoRescale(rescale_camera_info);

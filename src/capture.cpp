@@ -10,7 +10,7 @@ namespace cv_camera
 namespace enc = sensor_msgs::image_encodings;
 
 Capture::Capture(ros::NodeHandle &node, const std::string &topic_name,
-                 int32_t buffer_size, const std::string &frame_id_prefix)
+                 int32_t buffer_size, const std::string &frame_id)
     : node_(node),
       left_it_(ros::NodeHandle(node, "left")),
       right_it_(ros::NodeHandle(node, "right")),
@@ -19,8 +19,8 @@ Capture::Capture(ros::NodeHandle &node, const std::string &topic_name,
       left_info_manager_(ros::NodeHandle(node, "left"), "left_camera"),
       right_info_manager_(ros::NodeHandle(node, "right"), "right_camera")
 {
-  left_frame_id_ = frame_id_prefix + "_left_optical_frame";
-  right_frame_id_ = frame_id_prefix + "_right_optical_frame";
+  left_frame_id_ = frame_id;
+  right_frame_id_ = frame_id;
 
   node_.param<std::string>("filter_type", filter_type_, "none");
   if ( filter_type_ == "blur" || filter_type_ == "gauss" )

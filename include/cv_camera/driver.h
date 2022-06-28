@@ -7,14 +7,13 @@
 
 namespace cv_camera
 {
-
-/**
- * @brief ROS cv camera driver.
- *
- * This wraps getting parameters and publish in specified rate.
- */
-class Driver
-{
+ /**
+  * @brief ROS cv camera driver.
+  *
+  * This wraps getting parameters and publish in specified rate.
+  */
+ class Driver
+ {
  public:
   /**
    * @brief construct with ROS node handles.
@@ -25,8 +24,8 @@ class Driver
    * @param private_node node for getting parameters.
    * @param camera_node node for publishing.
    */
-  Driver(ros::NodeHandle& private_node,
-         ros::NodeHandle& camera_node);
+  Driver(ros::NodeHandle &private_node,
+         ros::NodeHandle &camera_node);
   ~Driver();
 
   /**
@@ -39,6 +38,7 @@ class Driver
    * @brief Capture, publish and sleep
    */
   void proceed();
+
  private:
   /**
    * @brief ROS private node for getting ROS parameters.
@@ -57,8 +57,8 @@ class Driver
    * @brief publishing rate.
    */
   boost::shared_ptr<ros::Rate> rate_;
-};
+ };
 
-}  // namespace cv_camera
+} // namespace cv_camera
 
-#endif  // CV_CAMERA_DRIVER_H
+#endif // CV_CAMERA_DRIVER_H

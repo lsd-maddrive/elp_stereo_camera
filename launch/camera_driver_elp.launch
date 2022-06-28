@@ -28,7 +28,7 @@
 		<param name="image_width" value="$(arg image_width)" />
 		<param name="image_height" value="$(arg image_height)" />
 		<param name="rate" value="$(arg framerate)" /> 
-		<param name="frame_id_prefix" value="$(arg frame_id_prefix)" />
+		<param name="frame_id" value="$(arg frame_id_prefix)_left_optical" />
 
 		<param name="filter_type" value="$(arg filter_type)" />
 		<param name="filter_kernel" value="$(arg filter_kernel)" />
