@@ -39,9 +39,10 @@
 	<node pkg="tf" type="static_transform_publisher" name="tf_$(arg frame_id_prefix)_2_$(arg frame_id_prefix)_left" args="0 0.03 0 0 0 0 $(arg frame_id_prefix)_link $(arg frame_id_prefix)_left $(arg publish_tf_period)" />
 	<node pkg="tf" type="static_transform_publisher" name="tf_$(arg frame_id_prefix)_2_$(arg frame_id_prefix)_right" args="0 -0.03 0 0 0 0 $(arg frame_id_prefix)_link $(arg frame_id_prefix)_right $(arg publish_tf_period)" />
 
-	<node pkg="tf" type="static_transform_publisher" name="tf_$(arg frame_id_prefix)_2_$(arg frame_id_prefix)_left_optical" args="0 0 0 -1.570796 0 -1.570796 $(arg frame_id_prefix)_left $(arg frame_id_prefix)_left_optical_frame $(arg publish_tf_period)" />
-	<node pkg="tf" type="static_transform_publisher" name="tf_$(arg frame_id_prefix)_2_$(arg frame_id_prefix)_right_optical" args="0 0 0 -1.570796 0 -1.570796 $(arg frame_id_prefix)_right $(arg frame_id_prefix)_right_optical_frame $(arg publish_tf_period)" />
+	<node pkg="tf" type="static_transform_publisher" name="tf_$(arg frame_id_prefix)_2_$(arg frame_id_prefix)_left_optical" args="0 0 0 -1.570796 0 -1.570796 $(arg frame_id_prefix)_left $(arg frame_id_prefix)_left_optical $(arg publish_tf_period)" />
+	<node pkg="tf" type="static_transform_publisher" name="tf_$(arg frame_id_prefix)_2_$(arg frame_id_prefix)_right_optical" args="0 0 0 -1.570796 0 -1.570796 $(arg frame_id_prefix)_right $(arg frame_id_prefix)_right_optical $(arg publish_tf_period)" />
 
+	
 	<node if="$(arg camera_info)" ns="$(arg camera)" pkg="stereo_image_proc" type="stereo_image_proc" name="stereo_image_proc" output="screen">
     	<rosparam file="$(arg stereo_params_path)" command="load" />
 	</node>
